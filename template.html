@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>{{.TaskName}} - {{.Contest}}</title>
+
+    <link rel="stylesheet" href="{{.StaticDir}}/libs/markdown/katex.min.css">
+    <link rel="stylesheet" href="{{.StaticDir}}/css/markdown.css">
+    <link rel="stylesheet" href="{{.StaticDir}}/css/styles.css">
+    <link rel="stylesheet" href="{{.StaticDir}}/css/pdf.css">
+
+    <script type="text/javascript" src="{{.StaticDir}}/libs/jquery/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="{{.StaticDir}}/libs/markdown/marked.js"></script>
+    <script type="text/javascript" src="{{.StaticDir}}/js/init-marked.js"></script>
+    <script type="text/javascript" src="{{.StaticDir}}/libs/markdown/katex.min.js"></script>
+    <script type="text/javascript" src="{{.StaticDir}}/libs/markdown/auto-render.min.js"></script>
+</head>
+
+<body>
+    <div class="markdown-body pdf">
+        <div class="header">
+            <div class="logo">
+                <img src="{{.Banner}}" />
+            </div>
+
+            <div class="meta">
+                <div>{{.TaskName}}</div>
+                <div>{{.Contest}} Tasks</div>
+                <div>{{.Language}}</div>
+            </div>
+
+            <div style="clear: both;"></div>
+            <hr>
+        </div>
+
+        <div id="markdown" style="display: none">{{.Content}}</div>
+        <div id="preview" class="rendered_content" dir="ltr" lang="{{.Language}}"></div>
+    </div>
+</body>
+<script>
+
+    $(document).ready(function () {
+        var mutated = Date.now();
+        var observer = new MutationObserver(function () { mutated = Date.now(); });
+        function checkMutation() {
+            if (Date.now() - 1000 < mutated)
+                return setTimeout(checkMutation, 100);
+            window.print();
+        }
+        observer.observe(document, { childList: true, subtree: true });
+
+        text = $('#markdown')[0].innerHTML;
+        marked.setOptions({ smartypants: true });
+        $('#preview').html(marked(text));
+        renderMathInElement(document.getElementById("preview"), {
+            delimiters: [
+                { left: '$$', right: '$$', display: true },
+                { left: '$', right: '$', display: false },
+                { left: '\\(', right: '\\)', display: false },
+                { left: '\\[', right: '\\]', display: true }
+            ],
+            // • rendering keys, e.g.:
+            throwOnError: false
+        });
+
+        setTimeout(checkMutation, 100);
+    });
+</script>
+
+</html>

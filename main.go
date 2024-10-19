@@ -1,9 +1,11 @@
 package main
 
 import (
+	"embed"
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io/fs"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -27,6 +29,26 @@ const default_json_config string = `{
     "contest": "contest"
 }
 `
+
+//go:embed static
+var static_files embed.FS
+
+//go:embed template.html
+var template_html string
+
+func extract_static_files(dir []fs.DirEntry, path string, root string){
+	os.Mkdir(filepath.Join(root, path), 0755)
+	
+	for _, file := range dir {
+		if file.IsDir() {
+			file_dir, _ := static_files.ReadDir(filepath.Join(path, file.Name()))
+			extract_static_files(file_dir, filepath.Join(path, file.Name()), root)
+		} else {
+			content, _ := static_files.ReadFile(filepath.Join(path, file.Name()))
+			os.WriteFile(filepath.Join(root, path, file.Name()), content, 0644)
+		}
+	}
+}
 
 var browser_list = [...]string{"chromium", "google-chrome", "brave"}
 
@@ -116,18 +138,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	userHomeDir, err := os.UserHomeDir()
-
 	var banner_options = [...]string{
 		filepath.Join(filePath, "banner.svg"),
 		filepath.Join(filePath, "banner.png"),
-		"XXX",
-		"XXX",
-	}
-
-	if err == nil {
-		banner_options[2] = filepath.Join(userHomeDir, ".oistatement/banner.svg")
-		banner_options[3] = filepath.Join(userHomeDir, ".oistatement/banner.png")
 	}
 
 	if banner == "" {
@@ -141,14 +154,10 @@ func main() {
 			}
 		}
 		if banner == "" {
-			fmt.Fprint(os.Stderr, "Error: No banner found.\nLooked for banner in following locations:\n")
-			for _, b := range banner_options {
-				if b != "XXX" {
-					fmt.Fprintf(os.Stderr, "  %s\n", b)
-				}
-			}
-			fmt.Fprintf(os.Stderr, "Please specify your banner using the -banner flag.\n")
-			os.Exit(1)
+			fmt.Fprint(os.Stderr, "Warning: No banner found\n")
+			fmt.Fprintf(os.Stderr, "Creating an empty banner.svg for now\n")
+			err = os.WriteFile(filepath.Join(filePath, "banner.svg"), []byte(""), 0644)			
+			banner = filepath.Join(filePath, "banner.svg")
 		}
 	}
 	
@@ -162,25 +171,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	var static_dir_list = [2]string{"/opt/oistatement/static", "XXX"}
-	if userHomeDir != "" {
-		static_dir_list[1] = filepath.Join(userHomeDir, ".oistatement/static")
-	}
-	var static_dir string = ""
-	for _, d := range static_dir_list {
-		if d != "XXX" {
-			dInfo, err := os.Stat(d)
-			if err == nil && dInfo.IsDir() {
-				static_dir = d
-				break
-			}
-		}
-	}
-	if static_dir == "" {
-		fmt.Fprint(os.Stderr, "Error: No static directory found. Please check your installation.\n")
-		os.Exit(1)
-	}
-
 	content, err := os.ReadFile(file)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: Unable to read file %s\n", file)
@@ -188,7 +178,7 @@ func main() {
 	}
 
 	jsonConfig.Banner, err = filepath.Abs(banner)
-	jsonConfig.StaticDir, err = filepath.Abs(static_dir)
+	jsonConfig.StaticDir = "static"
 	jsonConfig.Content = string(content)
 	
 	if browser == "" {
@@ -212,16 +202,21 @@ func main() {
 	}
 	fmt.Fprintf(os.Stderr, "Using browser: %s\n", browser)
 
-	tempFile, err := os.CreateTemp("", "oistatement-*.html")
+	fmt.Fprintf(os.Stderr, "Extracting files\n")
+	tempDir, err := os.MkdirTemp("", "oistatement-*")
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: Unable to create temporary file\n")
+		fmt.Fprintf(os.Stderr, "Error: Unable to create temporary directory\n")
 		os.Exit(1)
 	}
-	defer os.Remove(tempFile.Name())
+	defer os.RemoveAll(tempDir)
+	tempFile, err := os.Create(filepath.Join(tempDir, "template.html"))
 
-	md_template := template.Must(template.ParseFiles(filepath.Join(static_dir, "template.html")))
+	md_template := template.Must(template.New("html-template").Parse(template_html))
 	md_template.Execute(tempFile, jsonConfig)
 	pdf_file := filepath.Join(filePath, fileBasename + ".pdf")
+
+	static_files_dir, _ := static_files.ReadDir("static")
+	extract_static_files(static_files_dir, "static", tempDir)
 
 	cmd := exec.Command(
 		browser,
