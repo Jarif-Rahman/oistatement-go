@@ -137,7 +137,7 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Error: File %s is not valid\n", jsonConfigFile)
 		os.Exit(1)
 	}
-	
+
 	var banner_options = [...]string{
 		filepath.Join(filePath, "banner.svg"),
 		filepath.Join(filePath, "banner.png"),
@@ -154,14 +154,10 @@ func main() {
 			}
 		}
 		if banner == "" {
-			fmt.Fprint(os.Stderr, "Error: No banner found.\nLooked for banner in following locations:\n")
-			for _, b := range banner_options {
-				if b != "XXX" {
-					fmt.Fprintf(os.Stderr, "  %s\n", b)
-				}
-			}
-			fmt.Fprintf(os.Stderr, "Please specify your banner using the -banner flag.\n")
-			os.Exit(1)
+			fmt.Fprint(os.Stderr, "Warning: No banner found\n")
+			fmt.Fprintf(os.Stderr, "Creating an empty banner.svg for now\n")
+			err = os.WriteFile(filepath.Join(filePath, "banner.svg"), []byte(""), 0644)			
+			banner = filepath.Join(filePath, "banner.svg")
 		}
 	}
 	
