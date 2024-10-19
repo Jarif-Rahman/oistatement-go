@@ -1,11 +1,11 @@
 # oistatement-go
 
-Based on Rezwan Arefin's [oistatement](https://github.com/RezwanArefin01/oistatement). A tool to generate statements for OI-like contests
+Based on Rezwan Arefin's [oistatement](https://github.com/RezwanArefin01/oistatement). A tool to generate statements for OI-like contests.
 
 ## Installation
-- Install [cpdf](https://github.com/coherentgraphics/cpdf-binaries). (If you are using arch, you can install it from [aur](https://aur.archlinux.org/packages/cpdf-bin).)
+- Install [cpdf](https://github.com/coherentgraphics/cpdf-binaries) (If you are using arch, you can install it from [aur](https://aur.archlinux.org/packages/cpdf-bin)).
 - Install any chromium-based browser (for example: Chromium, Google Chrome, Brave).
-- Download `oistatement-go` binary from the [releases](`https://github.com/Jarif-Rahman/oistatement-go/releases/latest`) page. This is the only file you need to run the program. You can start using oistatement-go by running: `./oistatement-go`. For ease of use, it is recommended that you copy this binary to a folder that is in your PATH (for example: `~/.local/share/bin`).
+- Download `oistatement-go` binary from the [releases](https://github.com/Jarif-Rahman/oistatement-go/releases/latest) page. This is the only file you need to run the program. You can start using oistatement-go by running: `./oistatement-go`. For ease of use, it is recommended that you copy this binary to a folder that is in your PATH (for example: `~/.local/bin`).
 
 ## Usage 
 You can convert a markdown file into pdf statement using:
