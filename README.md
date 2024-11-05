@@ -4,6 +4,7 @@ Based on Rezwan Arefin's [oistatement](https://github.com/RezwanArefin01/oistate
 
 ## Installation
 - Install [cpdf](https://github.com/coherentgraphics/cpdf-binaries) (If you are using arch, you can install it from [aur](https://aur.archlinux.org/packages/cpdf-bin)).
+- Make sure you have common fonts like Arial and Noto Sans installed.
 - Install any chromium-based browser (for example: Chromium, Google Chrome, Brave).
 - Download `oistatement-go` binary from the [releases](https://github.com/Jarif-Rahman/oistatement-go/releases/latest) page. This is the only file you need to run the program. You can start using oistatement-go by running: `./oistatement-go`. For ease of use, it is recommended that you copy this binary to a folder that is in your PATH (for example: `~/.local/bin`).
 
