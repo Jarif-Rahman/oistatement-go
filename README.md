@@ -14,3 +14,5 @@ You can convert a markdown file into pdf statement using:
 oistatement-go statement.md
 ```
 This command expects a file named `banner.svg` or `banner.png` to be in the same folder as `statement.md`. If no banner file is found, an empty banner.svg file will be created. The command also expects a configuration file named `name-of-the-markdown-file.json` to be present in the folder. If this file is missing, a new file with default configuration will be created.
+
+This tool is mainly used by BdOI. If you are looking for BdOI banner, you can find it [here](https://raw.githubusercontent.com/RezwanArefin01/oistatement/refs/heads/master/static/img/current_banner.svg).
