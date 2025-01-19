@@ -178,7 +178,6 @@ func main() {
 	}
 
 	jsonConfig.Banner, err = filepath.Abs(banner)
-	jsonConfig.StaticDir = "static"
 	jsonConfig.Content = string(content)
 	
 	if browser == "" {
@@ -209,7 +208,14 @@ func main() {
 		os.Exit(1)
 	}
 	defer os.RemoveAll(tempDir)
-	tempFile, err := os.Create(filepath.Join(tempDir, "template.html"))
+	jsonConfig.StaticDir = filepath.Join(tempDir, "static")
+
+	tempFile, err := os.CreateTemp(filePath, ".template-*.html")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: Unable to create temporary file\n")
+		os.Exit(1)
+	}
+	defer os.Remove(tempFile.Name())
 
 	md_template := template.Must(template.New("html-template").Parse(template_html))
 	md_template.Execute(tempFile, jsonConfig)
@@ -231,6 +237,7 @@ func main() {
 		"--virtual-time-budget=10000",
 		tempFile.Name(),
 	)
+
 	err = cmd.Run()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error: Error occurred while printing to pdf\n")
