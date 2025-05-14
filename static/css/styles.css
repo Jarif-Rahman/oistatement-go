@@ -239,7 +239,7 @@ code::before, code::after,
 }
 
 code, pre {
-    font-family: 'Source Code Pro', Menlo, Monaco, Consolas, "Courier New", monospace;
+    font-family: 'Liberation Mono', 'Source Code Pro', Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
 /* Default text fonts */
